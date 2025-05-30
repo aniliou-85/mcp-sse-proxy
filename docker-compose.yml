@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  mcp-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp_sse_proxy
+    ports:
+      - "3006:3006"
+
+    # restart: unless-stopped
