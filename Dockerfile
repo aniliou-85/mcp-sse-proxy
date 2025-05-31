@@ -3,8 +3,11 @@ FROM node:22-alpine
 
 WORKDIR /usr/src/app
 
-# Create a non-root user and group for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Install uv (provides uv command, a fast Python package installer)
+RUN apk add --no-cache curl ca-certificates \
+    && sh -c "$(curl -LsSf https://astral.sh/uv/install.sh)" \
+    && apk del curl
+ENV PATH="/root/.local/bin:${PATH}"
 
 # Copy package.json and package-lock.json (if you use one)
 # These should be in your project root.
@@ -30,12 +33,6 @@ RUN npm run build
 # Prune development dependencies to reduce the final image size
 # For npm v7+ use --omit=dev. For older npm, use --production.
 RUN npm prune --omit=dev
-
-# Change ownership of all application files to the non-root user
-RUN chown -R appuser:appgroup /usr/src/app
-
-# Switch to the non-root user
-USER appuser
 
 # Expose the port the application runs on (default is 3006)
 EXPOSE 3006
